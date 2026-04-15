@@ -1,0 +1,3 @@
+syntax = "proto3";
+package telemetry.v1;
+option go_package = "example.com/edge-telemetry-bridge/gen/telemetry/v1;telemetryv1";

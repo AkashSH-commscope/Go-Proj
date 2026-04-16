@@ -1,3 +1,36 @@
 syntax = "proto3";
+
 package telemetry.v1;
+
+// This tells the Go compiler what to name the generated package and where to put it
 option go_package = "example.com/edge-telemetry-bridge/gen/telemetry/v1;telemetryv1";
+
+// TelemetryService exposes recent readings ingested from MQTT and a live stream.
+service TelemetryService {
+  // Unary: fetch a bounded window of recent readings (you implement backing store).
+  rpc ListRecentReadings(ListRecentReadingsRequest) returns (ListRecentReadingsResponse);
+
+  // Server streaming: push new readings as they arrive from MQTT ingest (you wire fan-out).
+  rpc SubscribeReadings(SubscribeReadingsRequest) returns (stream Reading);
+}
+
+message Reading {
+  string gateway_id = 1;
+  string sensor_id = 2;
+  double value = 3;
+  int64 timestamp_unix_ms = 4;
+  string unit = 5;
+}
+
+message ListRecentReadingsRequest {
+  int32 limit = 1;
+  string gateway_id_prefix = 2;
+}
+
+message ListRecentReadingsResponse {
+  repeated Reading readings = 1;
+}
+
+message SubscribeReadingsRequest {
+  string gateway_id_prefix = 1;
+}
